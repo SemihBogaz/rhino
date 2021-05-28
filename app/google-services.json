@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "504756497808",
+    "project_id": "rhino-fa5bd",
+    "storage_bucket": "rhino-fa5bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504756497808:android:484927a92ecc6b8a515715",
+        "android_client_info": {
+          "package_name": "com.infosec.rhino"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504756497808-jte5rko8vmjmabte1tv4mjprol3tvjvt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3TVwjMsmYrkn1yR8JjvrnDYQj29L0FYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504756497808-jte5rko8vmjmabte1tv4mjprol3tvjvt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
