@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "504756497808-gia6nfqi4glgjug13jso106g18leoar5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.infosec.rhino",
+            "certificate_hash": "a1d4f0e2f7a67ae0737fcef0a66db0834c1a306a"
+          }
+        },
+        {
           "client_id": "504756497808-jte5rko8vmjmabte1tv4mjprol3tvjvt.apps.googleusercontent.com",
           "client_type": 3
         }

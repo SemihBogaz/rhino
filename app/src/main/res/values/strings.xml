@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Rhino</string>
+    <string name="didnt_get_code">Did not get OTP? <b>Click here to resend</b></string>
 </resources>
