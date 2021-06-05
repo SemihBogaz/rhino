@@ -20,6 +20,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.infosec.rhino.databinding.ActivityMainBinding;
 
 import java.util.concurrent.TimeUnit;
@@ -39,11 +45,15 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
+    private DatabaseReference mDatabaseReference;
 
     private static final String TAG = "MAIN_TAG";
 
     private ProgressDialog pd;
 
+    public static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+
+    private String mPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +63,41 @@ public class MainActivity extends AppCompatActivity {
 
         profileBinding = ActivityProfileBinding.inflate(getLayoutInflater());
 
-        binding.phoneLl.setVisibility(View.VISIBLE);
-        binding.codeLl.setVisibility(View.GONE);
+        /*binding.phoneLl.setVisibility(View.VISIBLE);
+        binding.codeLl.setVisibility(View.GONE);*/
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        pd = new ProgressDialog(this);
+       /* pd = new ProgressDialog(this);
         pd.setTitle("Please wait ...");
-        pd.setCanceledOnTouchOutside(false);
+        pd.setCanceledOnTouchOutside(false);*/
 
         firebaseUser = firebaseAuth.getCurrentUser();
+        mPhone = firebaseUser.getPhoneNumber();
+
+        mDatabaseReference = FirebaseDatabase.getInstance(DATABASE_URL).getReference("users");
+        Query checkUser = mDatabaseReference.orderByChild("phoneNumber").equalTo(mPhone);
+        checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+
+                    Log.d(TAG, "snapshot => "+snapshot);
+                    Intent intent = new Intent(MainActivity.this,UserMainActivity.class);
+                    intent.putExtra("phonee",mPhone);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this,error.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
 
         if (firebaseUser != null) {
-            String alreadyLoggedPhone = firebaseUser.getPhoneNumber();
-            profileBinding.userPhoneNumber.setText(alreadyLoggedPhone);
+            profileBinding.userPhoneNumber.setText(mPhone);
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
         }
         else {

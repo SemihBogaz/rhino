@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Rhino</string>
     <string name="didnt_get_code">Did not get OTP? <b>Click here to resend</b></string>
+    <string name="DATABASE_URL">https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/</string>
 </resources>

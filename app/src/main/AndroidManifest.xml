@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Rhino"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".UserMainActivity"></activity>
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,44 +1,46 @@
 package com.infosec.rhino;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.infosec.rhino.databinding.ActivityProfileBinding;
 
-import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
 
+    // gave db url as below because settings are different in the firefise console.
+    // can be removed via deleting project and creating again
+    public static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
     private ActivityProfileBinding binding;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabaseReference;
     private FirebaseAuth firebaseAuth;
+    private String mUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("test").setValue("Hello World");
+
+        mDatabaseReference = FirebaseDatabase.getInstance(DATABASE_URL).getReference("users");
         firebaseAuth = FirebaseAuth.getInstance();
         checkUserStatus();
 
-        super.onResume();
-        binding.saveBtn.setOnClickListener(v -> {
-            User user = new User(binding.userPhoneNumber.getText().toString(), binding.userName.getText().toString());
-            saveUser(user);
-        });
+        binding.saveBtn.setOnClickListener(v ->  {
+            String phoneNumber = binding.userPhoneNumber.getText().toString();
+            String userName = binding.userName.getText().toString();
+            User user = new User(phoneNumber, userName);
+            Log.d("VERİLER => ", mUid+" "+user.getName()+" "+user.getPhoneNumber());
+            mDatabaseReference.child(mUid).setValue(user);
+            Toast.makeText(ProfileActivity.this,"User is saved",Toast.LENGTH_LONG).show();
+            });
 
         binding.logOutBtn.setOnClickListener(v -> {
             firebaseAuth.signOut();
@@ -46,33 +48,15 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-
     private void checkUserStatus() {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null){
             String phone = firebaseUser.getPhoneNumber();
-            //User user = getUser(phone);
+            mUid = firebaseUser.getUid();
             binding.userPhoneNumber.setText(phone);
-           //binding.userName.setText(user.getName());
         }
         else{
             finish();
         }
-    }
-
-    private void saveUser(User user) {
-        mDatabase.child("users").child(user.getPhoneNumber()).setValue(user.getName());
-    }
-
-    private User getUser(String phone) {
-        User result = new User(phone);
-        Task<DataSnapshot> snapshot = mDatabase.child("users").child(phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                String name = String.valueOf(Objects.requireNonNull(task.getResult()).getValue());
-                result.setName(name);
-            }
-        });
-        return  result;
     }
 }
