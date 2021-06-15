@@ -1,7 +1,9 @@
 package com.infosec.rhino;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private String mUid;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
             String userName = binding.userName.getText().toString();
             User user = new User(phoneNumber, userName);
             Log.d("VERİLER => ", mUid+" "+user.getName()+" "+user.getPhoneNumber());
-            mDatabaseReference.child(mUid).setValue(user);
+            mDatabaseReference.child(mUid).setValue(user.toMap());
             Toast.makeText(ProfileActivity.this,"User is saved",Toast.LENGTH_LONG).show();
             });
 
