@@ -27,13 +27,6 @@ public class User {
     public User(String phoneNumber, String name) {
         this.phoneNumber = phoneNumber;
         this.name = name;
-        try {
-            KeyPair keyPair = Cryptography.generateNewRSAPair();
-            this.publicKey = Cryptography.encodeToBase64(keyPair.getPublic());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            this.publicKey = null;
-        }
     }
 
     public String getPhoneNumber() {
@@ -50,6 +43,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public Map<Object, Object> toMap() {
