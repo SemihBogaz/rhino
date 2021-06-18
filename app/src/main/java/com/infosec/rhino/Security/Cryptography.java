@@ -29,8 +29,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-@SuppressWarnings("unused")
-public class Cryptography {
+public final class Cryptography {
+
+    private static Cryptography cryptography;
 
     private static final String RSA = "RSA";
     private static final String RSAwPadding = "RSA/ECB/PKCS1Padding";
@@ -38,13 +39,15 @@ public class Cryptography {
     private static final String RSA_PUBLIC_SAVE_LOCATION = "rsa_public_key.txt";
     private static final String RSA_PRIVATE_SAVE_LOCATION = "rsa_private_key.txt";
     private static final String AES_SAVE_LOCATION = "aes_key.txt";
-    private final Context context;
     private PrivateKey privateKey;
     private PublicKey publicKey;
     private SecretKey secretKey;
 
     private Cryptography(Context context) {
-        this.context = context;
+    }
+
+    public static Cryptography getCryptography() {
+        return cryptography;
     }
 
     /**
@@ -57,12 +60,13 @@ public class Cryptography {
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static Cryptography newInstance(Context context) {
-        Cryptography cryptography = new Cryptography(context);
+        Cryptography newInstance = new Cryptography(context);
         try {
-            cryptography.reinitialize();
+            cryptography.reinitialize(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        cryptography = newInstance;
         return cryptography;
     }
 
@@ -75,10 +79,11 @@ public class Cryptography {
      **/
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static Cryptography loadInstance(Context context) throws IOException {
-        Cryptography cryptography = new Cryptography(context);
+        Cryptography newInstance = new Cryptography(context);
         cryptography.setSecretKey((SecretKey) readKey(context, AES_SAVE_LOCATION, Cryptography::getAESSecretKey));
         cryptography.setPrivateKey((PrivateKey) readKey(context, RSA_PRIVATE_SAVE_LOCATION, Cryptography::getRSAPrivateKey));
         cryptography.setPublicKey((PublicKey) readKey(context, RSA_PUBLIC_SAVE_LOCATION, Cryptography::getRSAPublicKey));
+        cryptography = newInstance;
         return cryptography;
     }
 
@@ -87,10 +92,10 @@ public class Cryptography {
      * Note that if an error occurs it means that the hardcoded static fields in this class is erroneous.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void reinitialize() {
+    public void reinitialize(Context context) {
         try {
-            this.updateRSAKeyPair();
-            this.updateAESKey();
+            this.updateRSAKeyPair(context);
+            this.updateAESKey(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,22 +106,22 @@ public class Cryptography {
      * Saves the encoded keys to internal storage.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void updateRSAKeyPair() throws Exception {
+    public void updateRSAKeyPair(Context context) throws Exception {
         KeyPairGenerator generator = KeyPairGenerator.getInstance(RSA);
         generator.initialize(2048);
         KeyPair result = generator.generateKeyPair();
         this.publicKey = result.getPublic();
         this.privateKey = result.getPrivate();
-        saveKey(this.context, result.getPublic(), RSA_PUBLIC_SAVE_LOCATION);
-        saveKey(this.context, result.getPrivate(), RSA_PRIVATE_SAVE_LOCATION);
+        saveKey(context, result.getPublic(), RSA_PUBLIC_SAVE_LOCATION);
+        saveKey(context, result.getPrivate(), RSA_PRIVATE_SAVE_LOCATION);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void updateAESKey() throws Exception {
+    public void updateAESKey(Context context) throws Exception {
         KeyGenerator generator = KeyGenerator.getInstance(AES);
         SecretKey secretKey = generator.generateKey();
         this.secretKey = secretKey;
-        saveKey(this.context, secretKey, AES_SAVE_LOCATION);
+        saveKey(context, secretKey, AES_SAVE_LOCATION);
     }
 
 
@@ -280,10 +285,6 @@ public class Cryptography {
         return AES_SAVE_LOCATION;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
@@ -302,6 +303,21 @@ public class Cryptography {
 
     public SecretKey getSecretKey() {
         return secretKey;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getPublicKeyString() {
+        return encodeToBase64(this.publicKey);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getPrivateKeyString() {
+        return encodeToBase64(this.privateKey);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getSecretKeyString() {
+        return encodeToBase64(this.secretKey);
     }
 
     public void setSecretKey(SecretKey secretKey) {
