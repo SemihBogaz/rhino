@@ -29,6 +29,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+@SuppressWarnings("unused")
 public final class Cryptography {
 
     private static Cryptography cryptography;
