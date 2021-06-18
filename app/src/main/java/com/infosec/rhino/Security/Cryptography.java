@@ -44,7 +44,7 @@ public final class Cryptography {
     private PublicKey publicKey;
     private SecretKey secretKey;
 
-    private Cryptography(Context context) {
+    private Cryptography() {
     }
 
     public static Cryptography getCryptography() {
@@ -61,7 +61,7 @@ public final class Cryptography {
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static Cryptography newInstance(Context context) {
-        Cryptography newInstance = new Cryptography(context);
+        Cryptography newInstance = new Cryptography();
         try {
             cryptography.reinitialize(context);
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public final class Cryptography {
      **/
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static Cryptography loadInstance(Context context) throws IOException {
-        Cryptography newInstance = new Cryptography(context);
+        Cryptography newInstance = new Cryptography();
         cryptography.setSecretKey((SecretKey) readKey(context, AES_SAVE_LOCATION, Cryptography::getAESSecretKey));
         cryptography.setPrivateKey((PrivateKey) readKey(context, RSA_PRIVATE_SAVE_LOCATION, Cryptography::getRSAPrivateKey));
         cryptography.setPublicKey((PublicKey) readKey(context, RSA_PUBLIC_SAVE_LOCATION, Cryptography::getRSAPublicKey));
