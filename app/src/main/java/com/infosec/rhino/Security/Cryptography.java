@@ -47,7 +47,7 @@ public final class Cryptography {
     private Cryptography() {
     }
 
-    public static Cryptography getCryptography() {
+    public static Cryptography getInstance() {
         return cryptography;
     }
 
@@ -152,7 +152,7 @@ public final class Cryptography {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String encodeToBase64(Key key) {
+    private static String encodeToBase64(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
@@ -164,7 +164,7 @@ public final class Cryptography {
      * @return A new Public Key for RSA. Null if generation fails.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static PublicKey getRSAPublicKey(String key) {
+    private static PublicKey getRSAPublicKey(String key) {
         try {
             byte[] byteKey = Base64.getDecoder().decode(key.getBytes());
             X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
@@ -185,7 +185,7 @@ public final class Cryptography {
      * @return A new private Ley for RSA. Null if generation fails.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static PrivateKey getRSAPrivateKey(String key) {
+    private static PrivateKey getRSAPrivateKey(String key) {
         try {
             byte[] byteKey = Base64.getDecoder().decode(key.getBytes());
             X509EncodedKeySpec X509privateKey = new X509EncodedKeySpec(byteKey);
@@ -206,21 +206,21 @@ public final class Cryptography {
      * @return A SecretKeySpec extracted from the input.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static SecretKey getAESSecretKey(String key) {
+    private static SecretKey getAESSecretKey(String key) {
         byte[] decoded = Base64.getDecoder().decode(key);
         return new SecretKeySpec(Arrays.copyOf(decoded, 16), AES);
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String RSA_encrypt(String text, Key key) throws Exception {
+    private static String RSA_encrypt(String text, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance(RSAwPadding);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String RSA_decrypt(String text, Key key) throws Exception {
+    private static String RSA_decrypt(String text, Key key) throws Exception {
         byte[] decodedText = Base64.getDecoder().decode(text);
         Cipher cipher = Cipher.getInstance(RSAwPadding);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -228,14 +228,14 @@ public final class Cryptography {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String AES_encrypt(String text, SecretKey key) throws Exception {
+    private static String AES_encrypt(String text, SecretKey key) throws Exception {
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String AES_decrypt(String text, SecretKey key) throws Exception {
+    private static String AES_decrypt(String text, SecretKey key) throws Exception {
         byte[] decodedText = Base64.getDecoder().decode(text);
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -286,23 +286,23 @@ public final class Cryptography {
         return AES_SAVE_LOCATION;
     }
 
-    public PrivateKey getPrivateKey() {
+    private PrivateKey getPrivateKey() {
         return privateKey;
     }
 
-    public void setPrivateKey(PrivateKey privateKey) {
+    private void setPrivateKey(PrivateKey privateKey) {
         this.privateKey = privateKey;
     }
 
-    public PublicKey getPublicKey() {
+    private PublicKey getPublicKey() {
         return publicKey;
     }
 
-    public void setPublicKey(PublicKey publicKey) {
+    private void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
 
-    public SecretKey getSecretKey() {
+    private SecretKey getSecretKey() {
         return secretKey;
     }
 
@@ -321,7 +321,7 @@ public final class Cryptography {
         return encodeToBase64(this.secretKey);
     }
 
-    public void setSecretKey(SecretKey secretKey) {
+    private void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
     }
 }
