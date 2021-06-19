@@ -1,4 +1,4 @@
-package com.infosec.rhino;
+package com.infosec.rhino.Models;
 
 public class User {
 

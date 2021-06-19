@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="10dp"
     android:background="@color/grey"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
 
     <ImageView
         android:id="@+id/iconIv"

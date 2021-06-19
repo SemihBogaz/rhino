@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:layout_gravity="center"
     android:background="#f7f7f7"
-    tools:context=".ProfileActivity">
+    tools:context=".Activities.ProfileActivity">
 
     <TextView
         android:id="@+id/loggedMessage"
