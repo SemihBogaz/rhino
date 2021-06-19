@@ -63,7 +63,7 @@ public final class Cryptography {
     public static Cryptography newInstance(Context context) {
         Cryptography newInstance = new Cryptography();
         try {
-            cryptography.reinitialize(context);
+            newInstance.reinitialize(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
