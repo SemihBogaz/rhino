@@ -9,10 +9,12 @@ import androidx.annotation.RequiresApi;
 import com.infosec.rhino.User;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -129,9 +131,9 @@ public final class Cryptography {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static void saveKey(Context context, Key key, String filename) throws IOException {
         FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-        byte[] encodedKey = encodeToBase64(key).getBytes();
-        outputStream.write(encodedKey);
-        outputStream.close();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        writer.write(encodeToBase64(key));
+        writer.close();
     }
 
     /**
