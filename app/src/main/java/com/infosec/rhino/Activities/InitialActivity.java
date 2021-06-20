@@ -42,13 +42,12 @@ public class InitialActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        boolean keysReset = false;
         try {
             Cryptography.loadInstance(getApplicationContext());
+            Cryptography.getInstance().updateRSAKeyPair(getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
             Cryptography.newInstance(getApplicationContext());
-            keysReset = true;
         }
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -64,7 +63,6 @@ public class InitialActivity extends AppCompatActivity {
         // send user to messaging page if user is enrolled else send to enroll
         mDatabaseReference = FirebaseDatabase.getInstance(DATABASE_URL).getReference("users");
         Query checkUser = mDatabaseReference.orderByChild("phoneNumber").equalTo(mPhone);
-        boolean finalKeysReset = keysReset;
         checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -75,11 +73,11 @@ public class InitialActivity extends AppCompatActivity {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (finalKeysReset) {
-                        User user = snapshot.getValue(User.class);
-                        user.setPublicKey(Cryptography.getInstance().getPublicKeyString());
-                        mDatabaseReference.child(user.getUid()).setValue(user);
-                    }
+                    User user = snapshot.getValue(User.class);
+                    assert user != null;
+                    user.setPublicKey(Cryptography.getInstance().getPublicKeyString());
+                    mDatabaseReference.child(user.getUid()).setValue(user);
+
                     Intent intent = new Intent(InitialActivity.this,UserMainActivity.class);
                     startActivity(intent);
                     finish();
