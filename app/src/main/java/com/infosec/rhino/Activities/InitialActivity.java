@@ -59,7 +59,6 @@ public class InitialActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     Intent intent = new Intent(InitialActivity.this,UserMainActivity.class);
-                    intent.putExtra("phonee",mPhone);
                     startActivity(intent);
                     finish();
                 }
@@ -75,9 +74,5 @@ public class InitialActivity extends AppCompatActivity {
                 Toast.makeText(InitialActivity.this,error.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
-
-
-
-
     }
 }

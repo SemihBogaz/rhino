@@ -28,17 +28,11 @@ import com.infosec.rhino.databinding.ActivityProfileBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private ActivityProfileBinding profileBinding;
-
-    private PhoneAuthProvider.ForceResendingToken forceResendingToken;
-
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-
     private String mVerificationId;
 
+    private PhoneAuthProvider.ForceResendingToken forceResendingToken;
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private FirebaseAuth firebaseAuth;
-
-    private static final String TAG = "MAIN_TAG";
 
     private ProgressDialog pd;
 
@@ -48,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        profileBinding = ActivityProfileBinding.inflate(getLayoutInflater());
 
         binding.phoneLl.setVisibility(View.VISIBLE);
         binding.codeLl.setVisibility(View.GONE);
@@ -76,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken token) {
                 super.onCodeSent(verificationId, forceResendingToken);
-                Log.d(TAG, "onCodeSent: " + verificationId);
 
                 mVerificationId = verificationId;
                 forceResendingToken = token;
@@ -91,44 +82,34 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        binding.phoneContinueBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String phone = binding.phoneEt.getText().toString().trim();
-                if (TextUtils.isEmpty(phone)) {
-                    Toast.makeText(MainActivity.this, "Please enter phone number ...", Toast.LENGTH_LONG).show();
-                } else {
-                    startPhoneNumberVerification(phone);
-                }
+        binding.phoneContinueBtn.setOnClickListener(v -> {
+            String phone = binding.phoneEt.getText().toString().trim();
+            if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(MainActivity.this, "Please enter phone number ...", Toast.LENGTH_LONG).show();
+            } else {
+                startPhoneNumberVerification(phone);
             }
         });
 
-        binding.resentCodeTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.codeEt.setText("");
-                String phone = binding.phoneEt.getText().toString();
-                if (TextUtils.isEmpty(phone)) {
-                    Toast.makeText(MainActivity.this, "Please enter phone number ...", Toast.LENGTH_LONG).show();
-                } else {
-                    resendVerificationCode(phone, forceResendingToken);
-                }
+        binding.resentCodeTv.setOnClickListener(v -> {
+            binding.codeEt.setText("");
+            String phone = binding.phoneEt.getText().toString();
+            if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(MainActivity.this, "Please enter phone number ...", Toast.LENGTH_LONG).show();
+            } else {
+                resendVerificationCode(phone, forceResendingToken);
             }
         });
 
-        binding.codeSubmitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String code = binding.codeEt.getText().toString().trim();
-                if (TextUtils.isEmpty(code)) {
-                    Toast.makeText(MainActivity.this, "Please enter verification code ...", Toast.LENGTH_LONG).show();
-                } else {
-                    verifyPhoneNumberWithCode(mVerificationId, code);
-                }
+        binding.codeSubmitBtn.setOnClickListener(v -> {
+            String code = binding.codeEt.getText().toString().trim();
+            if (TextUtils.isEmpty(code)) {
+                Toast.makeText(MainActivity.this, "Please enter verification code ...", Toast.LENGTH_LONG).show();
+            } else {
+                verifyPhoneNumberWithCode(mVerificationId, code);
             }
         });
     }
-    // end of on create
 
     private void startPhoneNumberVerification(String phone) {
         pd.setMessage("Verifying your phone number ...");
@@ -170,21 +151,15 @@ public class MainActivity extends AppCompatActivity {
     private void signInWithPhoneAuthCredentials(PhoneAuthCredential credential) {
         pd.setMessage("Logging In");
 
-        firebaseAuth.signInWithCredential(credential).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                pd.dismiss();
-                String phone = firebaseAuth.getCurrentUser().getPhoneNumber();
-                Toast.makeText(MainActivity.this, "Logged as " + phone, Toast.LENGTH_LONG).show();
+        firebaseAuth.signInWithCredential(credential).addOnSuccessListener(authResult -> {
+            pd.dismiss();
+            String phone = firebaseAuth.getCurrentUser().getPhoneNumber();
+            Toast.makeText(MainActivity.this, "Logged as " + phone, Toast.LENGTH_LONG).show();
 
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                pd.dismiss();
-                Toast.makeText(MainActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+        }).addOnFailureListener(e -> {
+            pd.dismiss();
+            Toast.makeText(MainActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
         });
     }
 }

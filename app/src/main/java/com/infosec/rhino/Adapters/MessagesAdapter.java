@@ -89,5 +89,4 @@ public class MessagesAdapter extends RecyclerView.Adapter{
             binding = ItemReceiveBinding.bind(itemView);
         }
     }
-
 }

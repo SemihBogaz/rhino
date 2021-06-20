@@ -27,7 +27,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
 
     }
 
-
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,21 +39,16 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         User user = users.get(position);
         holder.binding.rowUsername.setText(user.getName());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("name",user.getName());
-                //intent.putExtra("uid",user.getUid());
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("name",user.getName());
+            intent.putExtra("uid",user.getUid());
+            context.startActivity(intent);
         });
     }
 
     @Override
-    public int getItemCount() {
-        return users.size();
-    }
+    public int getItemCount() { return users.size(); }
 
     public class UserViewHolder extends RecyclerView.ViewHolder{
 

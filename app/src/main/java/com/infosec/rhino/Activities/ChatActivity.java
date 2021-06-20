@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,13 +25,13 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
 
-    ActivityChatBinding binding;
-    MessagesAdapter adapter;
-    ArrayList<Message> messages;
+    private ActivityChatBinding binding;
+    private MessagesAdapter adapter;
+    private ArrayList<Message> messages;
 
-    String senderRoom, receiverRoom;
+    private String senderRoom, receiverRoom;
 
-    FirebaseDatabase database;
+    private FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class ChatActivity extends AppCompatActivity {
         binding.chatRecycler.setAdapter(adapter);
 
         String name = getIntent().getStringExtra("name");
-        String receiverUid = getIntent().getStringExtra("uid"); //TODO uidyi user sınıfına ekle
+        String receiverUid = getIntent().getStringExtra("uid");
         String senderUid = FirebaseAuth.getInstance().getUid();
 
         senderRoom = senderUid + receiverUid;
@@ -52,7 +53,7 @@ public class ChatActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance(DATABASE_URL);
 
-        database.getReference().child("chats")
+        database.getReference("chats")
                 .child(senderRoom)
                 .child("messages")
                 .addValueEventListener(new ValueEventListener() {
@@ -72,37 +73,32 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
-        binding.sendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String messageText = binding.messageBox.getText().toString();
+        binding.sendBtn.setOnClickListener(v -> {
+            String messageText = binding.messageBox.getText().toString();
 
-                Date date = new Date();
-                Message message = new Message(messageText,senderUid, date.getTime());
-                binding.messageBox.setText("");
+            Date date = new Date();
+            Message message = new Message(messageText,senderUid, date.getTime());
+            binding.messageBox.setText("");
 
-                database.getReference().child("chats")
-                        .child(senderRoom)
-                        .child("messages")
-                        .push()
-                        .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        database.getReference().child("chats")
-                                .child(receiverRoom)
-                                .child("messages")
-                                .push()
-                                .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
+            database.getReference("chats")
+                    .child(senderRoom)
+                    .child("messages")
+                    .push()
+                    .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    database.getReference().child("chats")
+                            .child(receiverRoom)
+                            .child("messages")
+                            .push()
+                            .setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
 
-                            }
-                        });
-                    }
-                });
-
-
-            }
+                        }
+                    });
+                }
+            });
         });
 
         getSupportActionBar().setTitle(name);

@@ -12,7 +12,7 @@
         android:layout_height="32dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@tools:sample/avatars[7]" />
 
     <TextView
         android:id="@+id/rowUsername"

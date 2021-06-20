@@ -21,7 +21,6 @@ public class UserMainActivity extends AppCompatActivity {
     private ActivityUserMainBinding binding;
     private FirebaseDatabase database;
     private FirebaseAuth firebaseAuth;
-    private FirebaseUser firebaseUser;
     private ArrayList<User> users;
     private UsersAdapter usersAdapter;
 
@@ -35,7 +34,6 @@ public class UserMainActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance(DATABASE_URL);
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
         users = new ArrayList<>();
 
         usersAdapter = new UsersAdapter(this, users);
@@ -48,22 +46,12 @@ public class UserMainActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     User user = snapshot1.getValue(User.class);
                     users.add(user);
-
                 }
                 usersAdapter.notifyDataSetChanged();
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
-
-
-//        Intent intent = getIntent();
-//        String phoneee = intent.getStringExtra("phonee");
-//        String deneme ="Welcome "+phoneee;
-//        binding.deneme.setText(deneme);
     }
 }

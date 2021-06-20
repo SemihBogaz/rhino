@@ -9,10 +9,11 @@
         android:id="@+id/sentText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
         android:background="@drawable/sent_drawable"
         android:padding="5dp"
         android:text="TextView"
-        android:textSize="13sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

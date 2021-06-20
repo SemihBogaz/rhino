@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -38,15 +39,17 @@ public class ProfileActivity extends AppCompatActivity {
         binding.saveBtn.setOnClickListener(v ->  {
             String phoneNumber = binding.userPhoneNumber.getText().toString();
             String userName = binding.userName.getText().toString();
-            User user = new User(phoneNumber, userName);
-            Log.d("VERİLER => ", mUid+" "+user.getName()+" "+user.getPhoneNumber()); // TODO sil bunu
-            mDatabaseReference.child(mUid).setValue(user);
-            Toast.makeText(ProfileActivity.this,"User is saved",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(ProfileActivity.this, UserMainActivity.class);
-            intent.putExtra("phonee",phoneNumber);
-            startActivity(intent);
-            finish();
+            User user = new User(mUid, phoneNumber, userName);
+            mDatabaseReference.child(mUid).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    Toast.makeText(ProfileActivity.this,"User is saved",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(ProfileActivity.this, UserMainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             });
+        });
 
         binding.logOutBtn.setOnClickListener(v -> {
             firebaseAuth.signOut();
@@ -61,8 +64,6 @@ public class ProfileActivity extends AppCompatActivity {
             mUid = firebaseUser.getUid();
             binding.userPhoneNumber.setText(phone);
         }
-        else{
-            finish();
-        }
+        else{ finish(); }
     }
 }
