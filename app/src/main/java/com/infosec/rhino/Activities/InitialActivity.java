@@ -45,7 +45,7 @@ public class InitialActivity extends AppCompatActivity {
         boolean keysReset = false;
         try {
             Cryptography.loadInstance(getApplicationContext());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             Cryptography.newInstance(getApplicationContext());
             keysReset = true;

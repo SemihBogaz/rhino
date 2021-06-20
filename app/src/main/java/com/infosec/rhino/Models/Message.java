@@ -1,7 +1,7 @@
 package com.infosec.rhino.Models;
 
 public class Message {
-    private String messageId, text, senderId, RecipientId, AESKey;
+    private String messageId, text, senderId, RecipientId, AESKey, RSAPublicKey;
     private boolean isEncrypted;
     private long timestamp;
 
@@ -68,5 +68,13 @@ public class Message {
 
     public void setRecipientId(String recipientId) {
         RecipientId = recipientId;
+    }
+
+    public String getRSAPublicKey() {
+        return RSAPublicKey;
+    }
+
+    public void setRSAPublicKey(String RSAPublicKey) {
+        this.RSAPublicKey = RSAPublicKey;
     }
 }
