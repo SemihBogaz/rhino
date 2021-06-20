@@ -1,8 +1,10 @@
 package com.infosec.rhino.Activities;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.infosec.rhino.Models.User;
+import com.infosec.rhino.Security.Cryptography;
 import com.infosec.rhino.databinding.ActivityProfileBinding;
 
 
@@ -26,6 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private String mUid;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding.saveBtn.setOnClickListener(v ->  {
             String phoneNumber = binding.userPhoneNumber.getText().toString();
             String userName = binding.userName.getText().toString();
-            User user = new User(mUid, phoneNumber, userName);
+            User user = new User(mUid, phoneNumber, userName, Cryptography.getInstance().getPublicKeyString());
             mDatabaseReference.child(mUid).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void unused) {

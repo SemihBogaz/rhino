@@ -2,7 +2,7 @@ package com.infosec.rhino.Models;
 
 public class User {
 
-    private String uid,phoneNumber, name;
+    private String uid, phoneNumber, name, publicKey;
 
     public User() {
     }
@@ -11,10 +11,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public User(String uid,String phoneNumber, String name) {
+    public User(String uid,String phoneNumber, String name, String publicKey) {
         this.uid = uid;
         this.phoneNumber = phoneNumber;
         this.name = name;
+        this.publicKey = publicKey;
     }
 
     public String getUid() { return uid; }
@@ -35,5 +36,13 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 }
