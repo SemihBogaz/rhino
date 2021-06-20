@@ -67,7 +67,7 @@ public class ChatActivity extends AppCompatActivity {
                         messages.clear();
                         for (DataSnapshot snapshot1 : snapshot.getChildren()){
                             Message message = snapshot1.getValue(Message.class);
-                            Cryptography.getInstance().decryptMessage(message);
+                            if (message.isEncrypted()) Cryptography.getInstance().decryptMessage(message);
                             messages.add(message);
                         }
                         adapter.notifyDataSetChanged();
@@ -85,6 +85,11 @@ public class ChatActivity extends AppCompatActivity {
             Date date = new Date();
             Message message = new Message(messageText,senderUid, date.getTime());
             Cryptography.getInstance().encryptMessage(message, receiverPublicKey);
+            try {
+                Cryptography.getInstance().updateAESKey(getApplicationContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             binding.messageBox.setText("");
 
             database.getReference("chats")

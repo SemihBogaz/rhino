@@ -273,7 +273,7 @@ public final class Cryptography {
     public void decryptMessage(Message message) {
         try {
             String decryptedAESKey = RSA_decrypt(message.getAESKey(), this.privateKey);
-            String decryptedText = AES_decrypt(message.getText(), this.secretKey);
+            String decryptedText = AES_decrypt(message.getText(), getAESSecretKey(decryptedAESKey));
             message.setText(decryptedText);
             message.setEncrypted(false);
         } catch (Exception e) {
