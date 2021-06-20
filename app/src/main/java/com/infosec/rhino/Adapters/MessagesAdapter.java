@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.infosec.rhino.Models.Message;
-import com.infosec.rhino.Models.User;
 import com.infosec.rhino.R;
 import com.infosec.rhino.databinding.ItemReceiveBinding;
 import com.infosec.rhino.databinding.ItemSentBinding;
@@ -62,10 +61,10 @@ public class MessagesAdapter extends RecyclerView.Adapter{
 
         if (holder.getClass() == SentViewHolder.class){
             SentViewHolder viewHolder = (SentViewHolder)holder;
-            viewHolder.binding.sentText.setText(message.getMessage());
+            viewHolder.binding.sentText.setText(message.getText());
         }else {
             ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
-            viewHolder.binding.receiveText.setText(message.getMessage());
+            viewHolder.binding.receiveText.setText(message.getText());
         }
     }
 

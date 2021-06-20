@@ -1,9 +1,11 @@
 package com.infosec.rhino.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.infosec.rhino.Adapters.MessagesAdapter;
 import com.infosec.rhino.Models.Message;
+import com.infosec.rhino.Security.Cryptography;
 import com.infosec.rhino.databinding.ActivityChatBinding;
 
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private FirebaseDatabase database;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +50,7 @@ public class ChatActivity extends AppCompatActivity {
 
         String name = getIntent().getStringExtra("name");
         String receiverUid = getIntent().getStringExtra("uid");
+        String receiverPublicKey = getIntent().getStringExtra("publicKey");
         String senderUid = FirebaseAuth.getInstance().getUid();
 
         senderRoom = senderUid + receiverUid;
@@ -62,6 +67,7 @@ public class ChatActivity extends AppCompatActivity {
                         messages.clear();
                         for (DataSnapshot snapshot1 : snapshot.getChildren()){
                             Message message = snapshot1.getValue(Message.class);
+                            Cryptography.getInstance().decryptMessage(message);
                             messages.add(message);
                         }
                         adapter.notifyDataSetChanged();
@@ -78,6 +84,7 @@ public class ChatActivity extends AppCompatActivity {
 
             Date date = new Date();
             Message message = new Message(messageText,senderUid, date.getTime());
+            Cryptography.getInstance().encryptMessage(message, receiverPublicKey);
             binding.messageBox.setText("");
 
             database.getReference("chats")
