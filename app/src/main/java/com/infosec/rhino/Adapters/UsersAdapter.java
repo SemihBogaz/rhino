@@ -43,7 +43,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("publicKey", user.getPublicKey());
             intent.putExtra("name",user.getName());
-            intent.putExtra("uid",user.getUid());
+            intent.putExtra("uid",user.getuid());
             context.startActivity(intent);
         });
     }

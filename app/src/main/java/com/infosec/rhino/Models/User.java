@@ -11,16 +11,16 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public User(String uid,String phoneNumber, String name, String publicKey) {
+    public User(String uid, String phoneNumber, String name, String publicKey) {
         this.uid = uid;
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.publicKey = publicKey;
     }
 
-    public String getUid() { return uid; }
+    public String getuid() { return uid; }
 
-    public void setUid(String uid) { this.uid = uid; }
+    public void setuid(String uid) { this.uid = uid; }
 
     public String getPhoneNumber() {
         return phoneNumber;
