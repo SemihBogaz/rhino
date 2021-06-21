@@ -38,8 +38,9 @@ All security methods and algorithms are contained in the [Cryptography.java](htt
 
 
 ##Activity Explanation
-Initial Activity => Checks if user is logged with his/herphone before. If so, redirects user to UserMainActivity if not redirects MainActivity for sms verification **Enter**
-MainActivity => Takes user phone number and sends sms verification code using Firebase sms verification method. Then rediretcs user to ProfileActivity**Enter**
-ProfileActivity => User enters a username if saves user will be redirected to UserMainActivity and a user will be created according to User class**Enter**
-UserMainActivity => User can tap any of the user and starts a chat. Tapping redirects user to ChatActivity**Enter**
-ChatActivity => User can send and receive messages in a secure way.**Enter**
+
+Initial Activity => Checks if user is logged with his/herphone before. If so, redirects user to UserMainActivity if not redirects MainActivity for sms verification <br/>
+MainActivity => Takes user phone number and sends sms verification code using Firebase sms verification method. Then rediretcs user to ProfileActivity <br/>
+ProfileActivity => User enters a username if saves user will be redirected to UserMainActivity and a user will be created according to User class <br/>
+UserMainActivity => User can tap any of the user and starts a chat. Tapping redirects user to ChatActivity <br/>
+ChatActivity => User can send and receive messages in a secure way.
