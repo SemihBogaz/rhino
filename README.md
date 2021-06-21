@@ -30,3 +30,6 @@ Another addition is the ProGuard. ProGuard obfuscates the program code and makes
 
 This video shows the registration process and a simple example conversation:
 
+# Code Details
+
+All security methods and algorithms are contained in the [Cryptography.java](https://github.com/SemihBogaz/rhino/blob/master/app/src/main/java/com/infosec/rhino/Security/Cryptography.java) file and the class with the same name. This class implements a singleton pattern, and provides the required methods to read or create a new instance. For the algorithm implementations (for AES and RSA, and for key generation) Java's [Security package](https://docs.oracle.com/javase/7/docs/api/java/security/package-summary.html) is used. For storing keys simple IO operations with Android's internal storage is utilized. 
