@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -21,16 +22,24 @@ import com.infosec.rhino.Models.Message;
 import com.infosec.rhino.Security.Cryptography;
 import com.infosec.rhino.databinding.ActivityChatBinding;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ChatActivity extends AppCompatActivity {
 
     private static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+    private static final String MESSAGE_HISTORY_LOCATION = "messagehistory.txt";
 
     private ActivityChatBinding binding;
     private MessagesAdapter adapter;
     private ArrayList<Message> messages;
+    private HashMap<String, String> messageHistory;
 
     private String senderRoom, receiverRoom;
 
@@ -44,6 +53,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         messages = new ArrayList<>();
+        try {
+            messageHistory = getMessageHistory(getApplicationContext());
+        } catch (Exception e) {
+            messageHistory = new HashMap<>();
+        }
         adapter = new MessagesAdapter(this, messages);
         binding.chatRecycler.setLayoutManager(new LinearLayoutManager(this));
         binding.chatRecycler.setAdapter(adapter);
@@ -67,7 +81,16 @@ public class ChatActivity extends AppCompatActivity {
                         messages.clear();
                         for (DataSnapshot snapshot1 : snapshot.getChildren()){
                             Message message = snapshot1.getValue(Message.class);
-                            if (message.isEncrypted()) Cryptography.getInstance().decryptMessage(message);
+                            assert message != null;
+                            if (!message.getSenderId().equals(senderUid)) {
+                                if (message.isEncrypted()) {
+                                    Cryptography.getInstance().decryptMessage(message);
+                                }
+                            } else {
+                                if (message.isEncrypted()) {
+                                    message.setText(messageHistory.get(message.getText()));
+                                }
+                            }
                             messages.add(message);
                         }
                         adapter.notifyDataSetChanged();
@@ -85,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
             Date date = new Date();
             Message message = new Message(messageText,senderUid, date.getTime());
             Cryptography.getInstance().encryptMessage(message, receiverPublicKey);
+            messageHistory.put(message.getText(), messageText);
             try {
                 Cryptography.getInstance().updateAESKey(getApplicationContext());
             } catch (Exception e) {
@@ -117,10 +141,35 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // to display title
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            saveMessageHistory(messageHistory, getApplicationContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // for back btn on supportActionBar
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
+    }
+
+    private static void saveMessageHistory(HashMap<String, String> messageHistory, Context context) throws IOException {
+        FileOutputStream outputStream = context.openFileOutput(MESSAGE_HISTORY_LOCATION, Context.MODE_PRIVATE);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(messageHistory);
+        objectOutputStream.close();
+    }
+
+    private HashMap<String, String> getMessageHistory(Context context) throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = context.openFileInput(MESSAGE_HISTORY_LOCATION);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        @SuppressWarnings("unchecked") HashMap<String, String> result = (HashMap<String, String>) objectInputStream.readObject();
+        objectInputStream.close();
+        return result;
     }
 }
