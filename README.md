@@ -35,3 +35,11 @@ https://youtu.be/Uw9AwGSSw7E
 # Code Details
 
 All security methods and algorithms are contained in the [Cryptography.java](https://github.com/SemihBogaz/rhino/blob/master/app/src/main/java/com/infosec/rhino/Security/Cryptography.java) file and the class with the same name. This class implements a singleton pattern, and provides the required methods to read or create a new instance. For the algorithm implementations (for AES and RSA, and for key generation) Java's [Security package](https://docs.oracle.com/javase/7/docs/api/java/security/package-summary.html) is used. For storing keys simple IO operations with Android's internal storage is utilized. 
+
+
+##Activity Explanation
+Initial Activity => Checks if user is logged with his/herphone before. If so, redirects user to UserMainActivity if not redirects MainActivity for sms verification
+MainActivity => Takes user phone number and sends sms verification code using Firebase sms verification method. Then rediretcs user to ProfileActivity
+ProfileActivity => User enters a username if saves user will be redirected to UserMainActivity and a user will be created according to User class
+UserMainActivity => User can tap any of the user and starts a chat. Tapping redirects user to ChatActivity
+ChatActivity => User can send and receive messages in a secure way.
