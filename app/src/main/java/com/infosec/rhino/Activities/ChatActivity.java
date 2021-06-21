@@ -93,6 +93,11 @@ public class ChatActivity extends AppCompatActivity {
                             }
                             messages.add(message);
                         }
+                        try {
+                            saveMessageHistory(messageHistory, getApplicationContext());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         adapter.notifyDataSetChanged();
                     }
 
@@ -139,16 +144,6 @@ public class ChatActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(name);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // to display title
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            saveMessageHistory(messageHistory, getApplicationContext());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     // for back btn on supportActionBar
