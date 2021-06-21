@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,8 +21,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.infosec.rhino.Models.User;
 import com.infosec.rhino.Security.Cryptography;
 import com.infosec.rhino.databinding.ActivityInitialBinding;
-
-import java.io.IOException;
 
 public class InitialActivity extends AppCompatActivity {
 
@@ -42,13 +41,12 @@ public class InitialActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        boolean keysReset = false;
         try {
             Cryptography.loadInstance(getApplicationContext());
-        } catch (IOException e) {
+            Cryptography.getInstance().updateRSAKeyPair(getApplicationContext());
+        } catch (Exception e) {
             e.printStackTrace();
             Cryptography.newInstance(getApplicationContext());
-            keysReset = true;
         }
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -62,24 +60,25 @@ public class InitialActivity extends AppCompatActivity {
         }
 
         // send user to messaging page if user is enrolled else send to enroll
-        mDatabaseReference = FirebaseDatabase.getInstance(DATABASE_URL).getReference("users");
+        mDatabaseReference = FirebaseDatabase.getInstance(DATABASE_URL).getReference("users/");
         Query checkUser = mDatabaseReference.orderByChild("phoneNumber").equalTo(mPhone);
-        boolean finalKeysReset = keysReset;
         checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
+                    DataSnapshot child =  snapshot.getChildren().iterator().next();
+                    Log.d("DB", child.toString());
                     // to show app icon
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (finalKeysReset) {
-                        User user = snapshot.getValue(User.class);
-                        user.setPublicKey(Cryptography.getInstance().getPublicKeyString());
-                        mDatabaseReference.child(user.getUid()).setValue(user);
-                    }
+                    User user = child.getValue(User.class);
+                    assert user != null;
+                    user.setPublicKey(Cryptography.getInstance().getPublicKeyString());
+                    mDatabaseReference.child(user.getuid()).setValue(user);
+
                     Intent intent = new Intent(InitialActivity.this,UserMainActivity.class);
                     startActivity(intent);
                     finish();

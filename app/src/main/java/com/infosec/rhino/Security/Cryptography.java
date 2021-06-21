@@ -7,16 +7,13 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-import com.infosec.rhino.Models.User;
 import com.infosec.rhino.Models.Message;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -27,8 +24,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.function.Function;
+import java.util.LinkedHashMap;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -45,12 +41,15 @@ public final class Cryptography {
     private static final String AES = "AES";
     private static final String RSA_PUBLIC_SAVE_LOCATION = "rsa_public_key.txt";
     private static final String RSA_PRIVATE_SAVE_LOCATION = "rsa_private_key.txt";
+    private static final String RSA_HISTORY_SAVE_LOCATION = "rsa_history.txt";
     private static final String AES_SAVE_LOCATION = "aes_key.txt";
     private PrivateKey privateKey;
     private PublicKey publicKey;
     private SecretKey secretKey;
+    private CachedMap<String, PrivateKey> keyHistory;
 
     private Cryptography() {
+        this.keyHistory = new CachedMap<>();
     }
 
     public static Cryptography getInstance() {
@@ -63,10 +62,9 @@ public final class Cryptography {
      * Note that any key that must be saved to an outside storage must be done afterwards.
      *
      * @param context The application context required for the IO operations.
-     * @return A newly initialized Cryptography object.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static Cryptography newInstance(Context context) {
+    public static void newInstance(Context context) {
         Cryptography newInstance = new Cryptography();
         try {
             newInstance.reinitialize(context);
@@ -74,24 +72,22 @@ public final class Cryptography {
             e.printStackTrace();
         }
         cryptography = newInstance;
-        return cryptography;
     }
 
     /**
      * Creates a new Cryptography object and initializes the fields from the local storage.
      *
      * @param context The application context required for the IO operations.
-     * @return A Cryptography object with the last stored fields.
      * @throws IOException if reading fails for any reason.
      **/
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static Cryptography loadInstance(Context context) throws IOException {
+    public static void loadInstance(Context context) throws Exception {
         Cryptography newInstance = new Cryptography();
-        newInstance.setSecretKey((SecretKey) readKey(context, AES_SAVE_LOCATION, Cryptography::getAESSecretKey));
-        newInstance.setPrivateKey((PrivateKey) readKey(context, RSA_PRIVATE_SAVE_LOCATION, Cryptography::getRSAPrivateKey));
-        newInstance.setPublicKey((PublicKey) readKey(context, RSA_PUBLIC_SAVE_LOCATION, Cryptography::getRSAPublicKey));
+        newInstance.setSecretKey((SecretKey) readKey(context, AES_SAVE_LOCATION));
+        newInstance.setPrivateKey((PrivateKey) readKey(context, RSA_PRIVATE_SAVE_LOCATION));
+        newInstance.setPublicKey((PublicKey) readKey(context, RSA_PUBLIC_SAVE_LOCATION));
+        newInstance.setKeyHistory(readKeyHistory(context));
         cryptography = newInstance;
-        return cryptography;
     }
 
     /**
@@ -121,6 +117,8 @@ public final class Cryptography {
         this.privateKey = result.getPrivate();
         saveKey(context, result.getPublic(), RSA_PUBLIC_SAVE_LOCATION);
         saveKey(context, result.getPrivate(), RSA_PRIVATE_SAVE_LOCATION);
+        this.keyHistory.put(this.getPublicKeyString(), this.privateKey);
+        saveKeyHistory(context, this.keyHistory);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -135,9 +133,9 @@ public final class Cryptography {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static void saveKey(Context context, Key key, String filename) throws IOException {
         FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-        writer.write(encodeToBase64(key));
-        writer.close();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(key);
+        objectOutputStream.close();
     }
 
     /**
@@ -145,16 +143,31 @@ public final class Cryptography {
      *
      * @param context     The application context required for IO operations.
      * @param filename    The filepath of the file.
-     * @param keyFunction The function that is used to restore the key in correct form.
      * @return The key restored from the string.
      * @throws IOException in case the reading fails.
      **/
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static Key readKey(Context context, String filename, Function<String, Key> keyFunction) throws IOException {
+    public static Key readKey(Context context, String filename) throws IOException, ClassNotFoundException {
         FileInputStream fileInputStream = context.openFileInput(filename);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
-        String line = reader.readLine();
-        return keyFunction.apply(line);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        Key result = (Key) objectInputStream.readObject();
+        objectInputStream.close();
+        return result;
+    }
+
+    private static CachedMap<String, PrivateKey> readKeyHistory(Context context) throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = context.openFileInput(Cryptography.RSA_HISTORY_SAVE_LOCATION);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        @SuppressWarnings("unchecked") CachedMap<String, PrivateKey> result = (CachedMap<String, PrivateKey>) objectInputStream.readObject();
+        objectInputStream.close();
+        return result;
+    }
+
+    private static void saveKeyHistory(Context context, CachedMap<String, PrivateKey> keyHistory) throws IOException {
+        FileOutputStream outputStream = context.openFileOutput(Cryptography.RSA_HISTORY_SAVE_LOCATION, Context.MODE_PRIVATE);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(keyHistory);
+        objectOutputStream.close();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -261,6 +274,7 @@ public final class Cryptography {
             String encryptedKey = RSA_encrypt(encodeToBase64(this.secretKey), getRSAPublicKey(recipientPK));
             message.setText(encryptedText);
             message.setAESKey(encryptedKey);
+            message.setRSAPublicKey(recipientPK);
             message.setEncrypted(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -272,7 +286,12 @@ public final class Cryptography {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void decryptMessage(Message message) {
         try {
-            String decryptedAESKey = RSA_decrypt(message.getAESKey(), this.privateKey);
+            String decryptedAESKey;
+            if (this.keyHistory.containsKey(message.getRSAPublicKey())) {
+                decryptedAESKey = RSA_decrypt(message.getAESKey(), this.keyHistory.get(message.getRSAPublicKey()));
+            } else {
+                decryptedAESKey = RSA_decrypt(message.getAESKey(), this.secretKey);
+            }
             String decryptedText = AES_decrypt(message.getText(), getAESSecretKey(decryptedAESKey));
             message.setText(decryptedText);
             message.setEncrypted(false);
@@ -340,5 +359,22 @@ public final class Cryptography {
 
     private void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public LinkedHashMap<String, PrivateKey> getKeyHistory() {
+        return keyHistory;
+    }
+
+    public void setKeyHistory(CachedMap<String, PrivateKey> keyHistory) {
+        this.keyHistory = keyHistory;
+    }
+
+    private static class CachedMap<T, V> extends LinkedHashMap<T, V> {
+        private final int maxCapacity = 25;
+
+        @Override
+        protected boolean removeEldestEntry(Entry<T, V> eldest) {
+            return this.size() > maxCapacity;
+        }
     }
 }
