@@ -30,7 +30,7 @@ public class InitialActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseReference;
 
     private String mPhone;
-    public static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+    public static final String DATABASE_URL = "";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
