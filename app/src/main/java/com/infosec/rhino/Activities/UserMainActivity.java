@@ -24,7 +24,7 @@ public class UserMainActivity extends AppCompatActivity {
     private ArrayList<User> users;
     private UsersAdapter usersAdapter;
 
-    public static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+    public static final String DATABASE_URL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
