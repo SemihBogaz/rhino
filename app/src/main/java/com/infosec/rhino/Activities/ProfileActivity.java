@@ -23,7 +23,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // gave db url as below because settings are different in the firefise console.
     // can be removed via deleting project and creating again
-    public static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+    public static final String DATABASE_URL = "";
     private ActivityProfileBinding binding;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth firebaseAuth;
