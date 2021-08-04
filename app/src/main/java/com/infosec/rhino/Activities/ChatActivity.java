@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final String DATABASE_URL = "https://rhino-fa5bd-default-rtdb.europe-west1.firebasedatabase.app/";
+    private static final String DATABASE_URL = "";
     private static final String MESSAGE_HISTORY_LOCATION = "messagehistory.txt";
 
     private ActivityChatBinding binding;
